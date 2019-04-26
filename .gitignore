@@ -23,7 +23,6 @@ yarn-error.log*
 # Ignore all css files
 /src/**/*.css
 
-/server/config/dev.js
 
 yarn.lock
 package-lock.json
