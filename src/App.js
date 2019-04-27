@@ -24,8 +24,13 @@ import * as actions from 'actions';
 
 import 'App.css';
 import Verification from './components/verification/Verification';
+import authService from './services/auth-service';
 
 const store = require('./reducers').init();
+
+if (!authService.isAuthenticated()) {
+  localStorage.clear();
+}
 
 class App extends Component {
 

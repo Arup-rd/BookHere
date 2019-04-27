@@ -78,7 +78,6 @@ const jwtVerify = token => new Promise((resolve, reject) => {
 exports.auth =  function(req, res) {
   const { email, password } = req.body;
 
-
   if (!password || !email) {
     return res.status(422).send({errors: [{title: 'Data missing!', detail: 'Provide email and password!'}]});
   }
@@ -95,7 +94,7 @@ exports.auth =  function(req, res) {
       const token = jwt.sign({
         userId: user.id,
         username: user.username
-      }, config.SECRET, { expiresIn: '1h'});
+      }, config.SECRET, { expiresIn: '24h'});
       return res.json(token);
     } else {
       return res.status(422).send({errors: [{title: 'Wrong Data!', detail: 'Wrong email or password'}]});

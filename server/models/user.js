@@ -32,14 +32,21 @@ const userSchema = new Schema({
   }]
 });
 
-userSchema.methods.hasSamePassword = function(requestedPassword) {
-  return bcrypt.compareSync(requestedPassword, this.password);
+userSchema.methods = {
+  hasSamePassword(requestedPassword) {
+    return bcrypt.compareSync(requestedPassword, this.password);
+  },
+  _hashPassword(password) {
+    return bcrypt.hashSync(password);
+  },
 }
-
-
-userSchema.pre('save', function(next) {
-  this.password = bcrypt.hashSync(this.password);
+userSchema.pre('save', function (next) {
+  if (this.isModified('password')) {
+    this.password = this._hashPassword(this.password);
+    return next();
+  }
   return next();
 });
+
 
 module.exports = mongoose.model('User', userSchema );
