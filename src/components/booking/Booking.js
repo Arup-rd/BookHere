@@ -128,17 +128,14 @@ class Booking extends React.Component {
   }
 
   reserveRental() {
-    console.log(this.state.proposedBooking)
     actions.createBooking(this.state.proposedBooking).then(
       (booking) => {
-        console.log(booking)
         this.addNewBookedOutDates(booking);
         this.cancelConfirmation();
         this.resetData();
         toast.success('Booking has been succesfuly created! Enjoy.');
       },
       (errors) => {
-        console.log(errors)
         this.setState({errors});
       })
   }

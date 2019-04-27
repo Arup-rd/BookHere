@@ -48,7 +48,7 @@ class App extends Component {
 
   render() {
     return (
-      <StripeProvider apiKey="pk_test_HgtMD9wHltUMpDw2mK4VbF6l">
+      <StripeProvider apiKey="pk_test_u873SECEg2vPE17cd6elxgJI0026huDrWb">
         <Provider store={store}>
           <BrowserRouter>
           <div className='App'>
