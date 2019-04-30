@@ -34,28 +34,23 @@ exports.ValidateAccount = async (req, res) => {
   const token = req.headers.token;
   try {
     const userInfo = await jwtVerify(token);
-    try {
-      // user = await userModel.create(userInfo);
-      const user = new User({
-        username: userInfo.username,
-        email: userInfo.email,
-        password: userInfo.password
-      });
-      await user.save(function(err) {
-        if (err) {
-          return res.status(422).send({errors: normalizeErrors(err.errors)});
-        }
-        console.log("verified")
-        res.json({
-          status: true,
-          message: "Your account verifcations successfull"
+    if(userInfo) {
+      try {
+        const findUser = await User.findOne({ email: userInfo.email });
+        findUser.is_active = true;
+        await findUser.save(function (err) {
+          if (err) {
+            return res.status(422).send({ errors: normalizeErrors(err.errors) });
+          }
+
+          return res.status(201).json({
+            message: "successfully verified",
+            status: true
+          })
         })
-      })
-    } catch (e) {
-      res.json({
-        status: false,
-        message: "Cannot verify"
-      })
+      } catch (e) {
+
+      }
     }
   } catch (e) {
     res.json({
@@ -90,14 +85,21 @@ exports.auth =  function(req, res) {
     if (!user) {
       return res.status(422).send({errors: [{title: 'Invalid User!', detail: 'User does not exist'}]});
     }
-    if (user.hasSamePassword(password)) {
-      const token = jwt.sign({
-        userId: user.id,
-        username: user.username
-      }, config.SECRET, { expiresIn: '24h'});
-      return res.json(token);
+    if(user.is_active) {
+      if (user.hasSamePassword(password)) {
+        const token = jwt.sign({
+          userId: user.id,
+          username: user.username
+        }, config.SECRET, { expiresIn: '24h'});
+        return res.json(token);
+      } else {
+        return res.status(422).send({errors: [{title: 'Wrong Data!', detail: 'Wrong email or password'}]});
+      }
     } else {
-      return res.status(422).send({errors: [{title: 'Wrong Data!', detail: 'Wrong email or password'}]});
+      res.status(421).json({
+        message: "Account is not activated",
+        status: false
+      })
     }
   });
 }
@@ -109,15 +111,14 @@ exports.register =  function(req, res, next) {
     return res.status(422).send({errors: [{title: 'Data missing!', detail: 'Provide email and password!'}]});
   }
 
-  if (password !== passwordConfirmation) {
-    return res.status(422).send({errors: [{title: 'Invalid passsword!', detail: 'Password is not a same as confirmation!'}]});
-  }
+  // if (password !== passwordConfirmation) {
+  //   return res.status(422).send({errors: [{title: 'Invalid passsword!', detail: 'Password is not a same as confirmation!'}]});
+  // }
 
   User.findOne({email}, function(err, existingUser) {
     if (err) {
       return res.status(422).send({errors: normalizeErrors(err.errors)});
     }
-
     if (existingUser) {
       return res.status(422).send({errors: [{title: 'Invalid email!', detail: 'User with this email already exist!'}]});
     }
@@ -127,10 +128,16 @@ exports.register =  function(req, res, next) {
       email,
       password
     });
+   
+    user.save(function (err) {
+      if (err) {
+        return res.status(422).send({ errors: normalizeErrors(err.errors) });
+      }
+      req.user = user;
+      next();
+    })
 
-    req.user = user;
 
-    next();
 
   })
 }

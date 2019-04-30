@@ -18,7 +18,6 @@ exports.SendVerificationMail = async (req, res) => {
     userId: req.user._id,
     username: req.user.username,
     email: req.user.email,
-    password: req.user.password
   }, config.SECRET, { expiresIn: '1h' });
 
 

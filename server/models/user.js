@@ -29,7 +29,11 @@ const userSchema = new Schema({
   bookings: [{ type: Schema.Types.ObjectId, ref: 'Booking' }],
   history: [{
     type: String
-  }]
+  }],
+  is_active: {
+    type: Boolean,
+    default: false
+  }
 });
 
 userSchema.methods = {

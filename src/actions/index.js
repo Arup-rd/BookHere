@@ -81,7 +81,7 @@ export const fetchRentals = (city) => {
     axiosInstance.get(url)
       .then(res => res.data )
       .then(rentals => dispatch(fetchRentalsSuccess(rentals)))
-      .catch(({response}) => dispatch(fetchRentalsFail(response.data.errors)))
+      .catch(({ response }) => dispatch(fetchRentalsFail(response && response.data.errors)))
   }
 }
 

@@ -16,12 +16,16 @@ const paymentRoutes = require('./routes/payments')
 
 const imageUploadRoutes = require('./routes/image-upload')
 
-mongoose.connect(config.DB_URI).then(() => {
-  if (process.env.NODE_ENV !== 'production') {
-    const fakeDb = new FakeDb() 
-    // fakeDb.seedDb()
-  }
-})
+try {
+  mongoose.connect(config.DB_URI).then(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      const fakeDb = new FakeDb()
+      // fakeDb.seedDb()
+    }
+  })
+} catch (e) {
+  console.log("Error db connection")
+}
 
 const app = express()
 
